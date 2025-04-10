@@ -2,6 +2,7 @@
 # https://github.com/manna-harbour/miryoku
 
 name: 'Build Inputs'
+
 on:
   workflow_dispatch:
     inputs:
@@ -65,6 +66,15 @@ on:
         description: 'modules'
         required: false
         default: 'default'
+      MIRYOKU_DEBUG:
+        description: 'Enable debug output'
+        required: false
+        default: ''
+        type: choice
+        options:
+        - ''
+        - 'MIRYOKU_DEBUG_TRUE'
+
 jobs:
   process-inputs:
     runs-on: ubuntu-latest
@@ -79,6 +89,7 @@ jobs:
       kconfig: ${{ steps.process-inputs.outputs.kconfig }}
       branches: ${{ steps.process-inputs.outputs.branches }}
       modules: ${{ steps.process-inputs.outputs.modules }}
+      MIRYOKU_DEBUG: ${{ steps.process-inputs.outputs.MIRYOKU_DEBUG }}
     steps:
       - name: Process inputs
         id: process-inputs
@@ -98,6 +109,8 @@ jobs:
           set-output "kconfig" "${{ github.event.inputs.kconfig }}"
           set-output "branches" "${{ github.event.inputs.branches }}"
           set-output "modules" "${{ github.event.inputs.modules }}"
+          set-output "MIRYOKU_DEBUG" "${{ github.event.inputs.MIRYOKU_DEBUG }}"
+
   build:
     uses: ./.github/workflows/main.yml
     secrets: inherit
@@ -113,3 +126,4 @@ jobs:
       kconfig: ${{ needs.process-inputs.outputs.kconfig }}
       branches: ${{ needs.process-inputs.outputs.branches }}
       modules: ${{ needs.process-inputs.outputs.modules }}
+      MIRYOKU_DEBUG: ${{ needs.process-inputs.outputs.MIRYOKU_DEBUG }}
